@@ -3,12 +3,38 @@ body {
 }
 h1 {
     color: blue;
-}
-p {
-    background-color: red;
+    text-align: center
 }
 
-a {
-    color: chartreuse;
-    size: 2cm
+div{
+    margin: auto;
+    width: 50%;
+    border: 3px solid green;
+    padding: 10px;
+    border-radius: 25px;
 }
+
+#story {
+    background-color: whitesmoke;
+    font-size: 12px;
+    color: black;
+    
+}
+
+#options {
+    background-color: whitesmoke;
+    font-size: 12px;
+    color:  black;
+}
+
+footer {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    background-color: #efefef;
+    text-align: center;
+    color: black;
+    font-size: 12px
+  }

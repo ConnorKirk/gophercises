@@ -6,18 +6,22 @@
 </head>
 
 <h1>{{.Title}}<h1>
+    <br>
     <body>
-        {{range .Paragraphs}} 
-        <p>
-            {{.}}
-        </p> 
-        {{end}}
-        <br><br>
+        <div id="story">
+            {{range .Paragraphs}} 
+            <p>
+                {{.}}
+            </p> 
+            {{end}}
+            </div>
+            <br><br>
 
-        {{if .Options}}
-        <p>How would you like to proceed?</p>
-        {{end}}
+            {{if .Options}}
+            <p>How would you like to proceed?</p>
+            {{end}}
 
+        <div id="options">
         {{range .Options}}
         <p>
             <a href="/{{.Chapter}}">{{.Text}}</a>
@@ -26,7 +30,16 @@
 
         {{else}}
         <p> This is the end of your journey</p>
+        <p> Thanks for playing!</p>
+        <img src="https://golang.org/doc/gopher/gophercolor.png" height="60" width="60">
+        <br>
+        <a href="/intro"> Restart?</a>
         {{end}}
+    </div>
+
+    <footer>
+        Made by <a href="ConnorKirkpatrick.com">Connor Kirkpatrick</a>
+    </footer>
  
 
     <body>
