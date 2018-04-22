@@ -1,0 +1,14 @@
+body {
+    background-color: powderblue;
+}
+h1 {
+    color: blue;
+}
+p {
+    background-color: red;
+}
+
+a {
+    color: chartreuse;
+    size: 2cm
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="static/styles.css">
+  <title>Welcome to CYOA</title>
+</head>
+
+<h1>{{.Title}}<h1>
+    <body>
+        {{range .Paragraphs}} 
+        <p>
+            {{.}}
+        </p> 
+        {{end}}
+        <br><br>
+
+        {{if .Options}}
+        <p>How would you like to proceed?</p>
+        {{end}}
+
+        {{range .Options}}
+        <p>
+            <a href="/{{.Chapter}}">{{.Text}}</a>
+            <br>
+        </p>
+
+        {{else}}
+        <p> This is the end of your journey</p>
+        {{end}}
+ 
+
+    <body>
+</html>

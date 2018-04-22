@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
 type parsedQuestionAnswer struct {
@@ -14,10 +15,14 @@ type parsedQuestionAnswer struct {
 
 func main() {
 
-	quizLocation := parseFlags()
-	questions := getQuestions(quizLocation)
-	correctAnswers := askQuiz(questions)
-	fmt.Printf("You've reached the end of the quiz!\n You scored %v out of %v\n", correctAnswers, len(questions))
+	csvFlag := flag.String("csv", "problems.csv", "Provide a custom quiz")
+	timerFlag := flag.Int("timer", 60, "Time limit for the quiz, in seconds")
+	flag.Parse()
+
+	questions := getQuestions(csvFlag)
+	timer := time.NewTimer(time.Duration(*timerFlag) * time.Second)
+	correctAnswers := askQuiz(questions, *timer)
+	fmt.Printf("You've reached the end of the quiz!\nYou scored %v out of %v\n", correctAnswers, len(questions))
 }
 
 func getQuestions(location *string) []parsedQuestionAnswer {
@@ -53,27 +58,31 @@ func parseQuestion(line string) parsedQuestionAnswer {
 	return q
 }
 
-func askQuiz(questions []parsedQuestionAnswer) int {
+func askQuiz(questions []parsedQuestionAnswer, timer time.Timer) int {
 	correctAnswers := 0
-
+problemLoop:
 	for i, item := range questions {
 
-		var givenAnswer string
 		fmt.Printf("Question %v: %v\n", i, item.question)
+		answerChan := make(chan string)
+		go func() {
+			var givenAnswer string
+			fmt.Scanf("%v\n", &givenAnswer)
+			answerChan <- givenAnswer
+		}()
 
-		fmt.Scanf("%v\n", &givenAnswer)
+		select {
+		case <-timer.C:
+			fmt.Printf("\nTime's up!\n")
+			break problemLoop
 
-		if item.answer == givenAnswer {
-			correctAnswers++
+		case answer := <-answerChan:
+			if item.answer == answer {
+				correctAnswers++
+			}
+
 		}
+
 	}
-
 	return correctAnswers
-}
-
-func parseFlags() *string {
-	csvFlag := flag.String("csv", "problems.csv", "Provide a custom quiz")
-
-	flag.Parse()
-	return csvFlag
 }
