@@ -8,12 +8,12 @@ import (
 	"strings"
 )
 
-func StoryHandler(s Story) http.HandlerFunc {
+func StoryHandler(s Story, startArc *string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
 		path = strings.Replace(path, "/", "", 1)
 		if path == "" {
-			path = "intro"
+			path = *startArc
 		}
 		tmpl := template.Must(template.ParseFiles("cyoa/templates.html"))
 		tmpl.Execute(w, s[path])
