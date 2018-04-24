@@ -1,26 +1,41 @@
 package linksearch
 
 import (
-	"fmt"
 	"io"
 	"log"
 
 	"golang.org/x/net/html"
 )
 
+var Links []Link
+
 func Search(page io.Reader) []Link {
-	f, err := html.Parse(page)
+	doc, err := html.Parse(page)
 
 	if err != nil {
 		log.Fatalf("couldn't parse %v: %v", page, err)
 	}
-	fmt.Println(f)
 
-	return nil
+	traverse(doc)
+
+	return Links
 }
 
-func traverse(n *html.Node) []Link {
-	fmt.Print(n.Data)
+func traverse(n *html.Node) {
 
-	return nil
+	if n.Type == html.ElementNode && n.Data == "a" {
+		foundLink := Link{}
+		for _, a := range n.Attr {
+			if a.Key == "href" {
+				foundLink.Href = a.Val
+				foundLink.Text = n.FirstChild.Data
+			}
+
+			Links = append(Links, foundLink)
+		}
+	}
+
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		traverse(c)
+	}
 }

@@ -4,15 +4,23 @@ import (
 	"flag"
 	"fmt"
 	"gophercise/exercise4/linksearch"
-	"net/http"
+	"io/ioutil"
+	"log"
+	"strings"
 )
 
 func main() {
-	page := flag.String("page", "", "page you wish to search")
-	res := http.Get(page)
+	page := flag.String("page", "ex1.html", "page you wish to search")
+	flag.Parse()
 
-	links := linksearch.Search(res.Body)
+	file, err := ioutil.ReadFile(*page)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	fmt.Println(links)
+	read := strings.NewReader(string(file))
+	links := linksearch.Search(read)
+
+	fmt.Println("Found links:", links)
 
 }
