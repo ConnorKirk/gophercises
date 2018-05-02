@@ -3,6 +3,7 @@ package linksearch
 import (
 	"io"
 	"log"
+	"strings"
 
 	"golang.org/x/net/html"
 )
@@ -67,4 +68,13 @@ func textTraverse(n *html.Node, s string) string {
 
 	return ret
 
+}
+
+func getHref(a html.Attribute) string {
+
+	if strings.HasSuffix(a.Val, "/") {
+		return a.Val[:len(a.Val)-1]
+	}
+
+	return a.Val
 }

@@ -3,6 +3,8 @@ package linksearch
 import (
 	"strings"
 	"testing"
+
+	"golang.org/x/net/html"
 )
 
 func TestSearch(t *testing.T) {
@@ -24,4 +26,18 @@ func TestSearch(t *testing.T) {
 	if foundLinks[0].Href != "/other-page" {
 		t.Errorf("Expected /other-page, got %v", foundLinks[0].Href)
 	}
+}
+
+func TestGetHref(t *testing.T) {
+	testAttribute := html.Attribute{
+		Namespace: "",
+		Key:       "a",
+		Val:       "./relative-link/",
+	}
+
+	href := getHref(testAttribute)
+	if href != "./relative-link" {
+		t.Errorf("Test failed. Got %v", href)
+	}
+
 }
