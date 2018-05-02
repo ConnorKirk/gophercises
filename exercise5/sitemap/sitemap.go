@@ -1,6 +1,7 @@
 package sitemap
 
 import (
+	"encoding/json"
 	"fmt"
 	"gophercise/exercise4/linksearch"
 	"io/ioutil"
@@ -19,53 +20,64 @@ func Build(site string) (string, error) {
 	seen = make(map[string]bool)
 
 	//initiate traverse
-	traverse(site)
+	traverse(site, site)
 
-	for s := range seen {
-		fmt.Printf("Seen: %v", s)
-	}
+	fmt.Printf("Found %v links\n", len(seen))
 
 	// convert seen to xml
-
+	out, err := json.Marshal(seen)
+	if err != nil {
+		return "", err
+	}
 	// return xml string
-	return "", nil
+	return string(out), nil
 }
 
-func traverse(page string) {
+func traverse(page string, basesite string) {
 	fmt.Printf("Traversing: %v\n", page)
 	// Add to seen
 	seen[page] = true
-	resp, err := http.Get(page)
+
+	s := getPage(page)
+	links := linksearch.Search(strings.NewReader(s))
+	fmt.Printf("Found %v links\n", len(links))
+	for _, l := range links {
+		nextLink := convertLink(basesite, l.Href)
+
+		if seen[nextLink] || !sameSite(nextLink, page) {
+			continue
+		}
+		traverse(nextLink, basesite)
+	}
+
+	//
+}
+
+func getPage(s string) string {
+	resp, err := http.Get(s)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer resp.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	s := string(bodyBytes)
-	links := linksearch.Search(strings.NewReader(s))
-	fmt.Printf("Found %v links\n", len(links))
-	for _, l := range links {
-		wholeLink := convertLink(page, l.Href)
-
-		if seen[wholeLink] || !sameSite(wholeLink, page) {
-			continue
-		}
-		traverse(wholeLink)
-	}
-
-	//
+	return string(bodyBytes)
 }
 
 //convertLink converts a relative url to an absolute url
-func convertLink(site string, link string) string {
+func convertLink(baseSite string, link string) string {
 	//Check if relative or absolute link
-	if strings.HasPrefix(link, "/") {
-		return site + link
+
+	if strings.HasSuffix(link, "/") {
+		link = link[:len(link)-1]
 	}
 
-	if strings.HasPrefix(link, "./") {
-		return site + link[1:]
+	if strings.HasPrefix(link, ".") {
+		return baseSite + link[1:]
+	}
+
+	if strings.HasPrefix(link, "/") {
+		return baseSite + link
 	}
 
 	return link
