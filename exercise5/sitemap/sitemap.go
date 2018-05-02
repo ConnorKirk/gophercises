@@ -21,10 +21,13 @@ func Build(site string) (string, error) {
 	//initiate traverse
 	traverse(site)
 
+	for s := range seen {
+		fmt.Printf("Seen: %v", s)
+	}
+
 	// convert seen to xml
 
 	// return xml string
-
 	return "", nil
 }
 
@@ -39,14 +42,13 @@ func traverse(page string) {
 
 	defer resp.Body.Close()
 	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-
-	fmt.Printf("%v", string(bodyBytes))
-	links := linksearch.Search(resp.Body)
-	fmt.Printf("Found %v links", len(links))
+	s := string(bodyBytes)
+	links := linksearch.Search(strings.NewReader(s))
+	fmt.Printf("Found %v links\n", len(links))
 	for _, l := range links {
 		wholeLink := convertLink(page, l.Href)
 
-		if !seen[wholeLink] {
+		if seen[wholeLink] || !sameSite(wholeLink, page) {
 			continue
 		}
 		traverse(wholeLink)
@@ -62,5 +64,13 @@ func convertLink(site string, link string) string {
 		return site + link
 	}
 
+	if strings.HasPrefix(link, "./") {
+		return site + link[1:]
+	}
+
 	return link
+}
+
+func sameSite(link, site string) bool {
+	return strings.HasPrefix(link, site)
 }
