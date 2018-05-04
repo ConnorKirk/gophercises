@@ -1,17 +1,21 @@
 package sitemap
 
 import (
-	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	"gophercise/exercise4/linksearch"
-	"io/ioutil"
-	"log"
-	"net/http"
-	"strings"
+	"io"
+	"os"
 )
 
 var seen map[string]bool
 var links []linksearch.Link
+
+type urlSet struct {
+	XMLName      xml.Name `xml:"urlset"`
+	XMLNamespace string   `xml:"xmlns,attr`
+	URLs         []string `xml:"url>loc"`
+}
 
 // Build takes a string declaring the site to be built
 func Build(site string) (string, error) {
@@ -21,11 +25,11 @@ func Build(site string) (string, error) {
 
 	//initiate traverse
 	traverse(site, site)
-
+	urlSet := buildURLSet(seen)
 	fmt.Printf("Found %v links\n", len(seen))
 
 	// convert seen to xml
-	out, err := json.Marshal(seen)
+	out, err := xml.Marshal(urlSet)
 	if err != nil {
 		return "", err
 	}
@@ -33,56 +37,24 @@ func Build(site string) (string, error) {
 	return string(out), nil
 }
 
-func traverse(page string, basesite string) {
-	fmt.Printf("Traversing: %v\n", page)
-	// Add to seen
-	seen[page] = true
+func buildURLSet(seen map[string]bool) urlSet {
+	var u urlSet
 
-	s := getPage(page)
-	links := linksearch.Search(strings.NewReader(s))
-	fmt.Printf("Found %v links\n", len(links))
-	for _, l := range links {
-		nextLink := convertLink(basesite, l.Href)
-
-		if seen[nextLink] || !sameSite(nextLink, page) {
-			continue
-		}
-		traverse(nextLink, basesite)
+	for k := range seen {
+		u.URLs = append(u.URLs, k)
 	}
 
-	//
+	return u
 }
 
-func getPage(s string) string {
-	resp, err := http.Get(s)
-	if err != nil {
-		log.Fatal(err)
-	}
+func buildXMLOutput(u urlSet) {
 
-	defer resp.Body.Close()
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
-	return string(bodyBytes)
-}
+	io.WriteString(os.Stdout, xml.Header)
+	enc := xml.NewEncoder(os.Stdout)
 
-//convertLink converts a relative url to an absolute url
-func convertLink(baseSite string, link string) string {
-	//Check if relative or absolute link
+	enc.Indent("  ", "    ")
+	enc.Encode(u)
 
-	if strings.HasSuffix(link, "/") {
-		link = link[:len(link)-1]
-	}
+	enc.Flush()
 
-	if strings.HasPrefix(link, ".") {
-		return baseSite + link[1:]
-	}
-
-	if strings.HasPrefix(link, "/") {
-		return baseSite + link
-	}
-
-	return link
-}
-
-func sameSite(link, site string) bool {
-	return strings.HasPrefix(link, site)
 }

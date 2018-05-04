@@ -27,15 +27,30 @@ func TestConvertLink(t *testing.T) {
 		}
 	}
 
-	// absoluteLink := "/this-is-an-absolute-link"
-	// l := convertLink(site, relativeLink)
-	// if l != "www.example.com/this-is-a-relative-link" {
-	// 	t.Errorf("relative link not converted. Got %v", l)
-	// }
+}
 
-	// al := convertLink(site, absoluteLink)
-	// if al != "www.example.com/this-is-an-absolute-link" {
-	// 	t.Errorf("relative link not converted. Got %v", al)
-	// }
+func TestBuildURLSet(t *testing.T) {
+	seen = map[string]bool{
+		"www.example.com":       true,
+		"www.example.com/about": true,
+		"www.example.com/faq":   true,
+	}
 
+	u := buildURLSet(seen)
+
+	if len(u.URLs) != 3 {
+		t.Errorf("Expecting 3, got %v", len(u.URLs))
+	}
+}
+
+func TestBuildXMLOutput(t *testing.T) {
+	u := urlSet{
+		XMLNamespace : `xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"`,
+		URLs :[]string{
+			"www.example.com",
+			"www.example.com/about",
+		},
+	}
+
+	buildXMLOutput(u)
 }
