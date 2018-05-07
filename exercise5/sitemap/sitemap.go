@@ -1,20 +1,22 @@
 package sitemap
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
 	"gophercise/exercise4/linksearch"
 	"io"
-	"os"
 )
 
 var seen map[string]bool
 var links []linksearch.Link
 
+type URL struct {
+	Address string `xml:"loc"`
+}
 type urlSet struct {
-	XMLName      xml.Name `xml:"urlset"`
-	XMLNamespace string   `xml:"xmlns,attr`
-	URLs         []string `xml:"url>loc"`
+	XMLName xml.Name `xml:"http://www.sitemaps.org/schemas/sitemap/0.9 urlset"`
+	URLs    []URL    `xml:"url"`
 }
 
 // Build takes a string declaring the site to be built
@@ -41,20 +43,21 @@ func buildURLSet(seen map[string]bool) urlSet {
 	var u urlSet
 
 	for k := range seen {
-		u.URLs = append(u.URLs, k)
+		newURL := URL{k}
+		u.URLs = append(u.URLs, newURL)
 	}
 
 	return u
 }
 
-func buildXMLOutput(u urlSet) {
-
-	io.WriteString(os.Stdout, xml.Header)
-	enc := xml.NewEncoder(os.Stdout)
+func buildXMLOutput(u urlSet) string {
+	b := new(bytes.Buffer)
+	io.WriteString(b, xml.Header)
+	enc := xml.NewEncoder(b)
 
 	enc.Indent("  ", "    ")
 	enc.Encode(u)
 
 	enc.Flush()
-
+	return b.String()
 }

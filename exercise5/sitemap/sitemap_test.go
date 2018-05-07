@@ -44,13 +44,27 @@ func TestBuildURLSet(t *testing.T) {
 }
 
 func TestBuildXMLOutput(t *testing.T) {
+
+	expected := `<?xml version="1.0" encoding="UTF-8"?>
+	<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+		<url>
+			<loc>www.example.com</loc>
+		</url>
+		<url>
+			<loc>www.example.com/about</loc>
+		</url>
+	</urlset>
+	`
 	u := urlSet{
-		XMLNamespace : `xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"`,
-		URLs :[]string{
-			"www.example.com",
-			"www.example.com/about",
+		URLs: []URL{
+			URL{("www.example.com")},
+			URL{("www.example.com/about")},
 		},
 	}
 
-	buildXMLOutput(u)
+	out := buildXMLOutput(u)
+
+	if out != expected {
+		t.Errorf("Output differs to expected. Expected:\n%v,\n Got:\n%v", expected, out)
+	}
 }
