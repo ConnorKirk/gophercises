@@ -1,6 +1,6 @@
-.vscode/launch.json
-.vscode/settings.json
+.vscode
+.vscode
 exercise1/debug
 
 debug.test
-^debug$
+debug$
