@@ -16,14 +16,18 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
+
+	"gophercise/exercise7/task/database"
+	"gophercise/exercise7/task/task"
 
 	"github.com/spf13/cobra"
 )
 
 // addCmd represents the add command
 var addCmd = &cobra.Command{
-	Use:   "add",
-	Short: "A brief description of your command",
+	Use:   "add [task to add]",
+	Short: "add a task to your todo list",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
@@ -31,7 +35,18 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("add called")
+		taskName := strings.Join(args, " ")
+
+		//open DB
+		db := database.OpenDB()
+		defer db.Close()
+
+
+		err := task.Add(taskName, db)
+		if err != nil{
+			fmt.Printf("Task could not be added: %v", err)
+		}
+		fmt.Printf("Task added: '%v'\n", taskName)
 	},
 }
 
