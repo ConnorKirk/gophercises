@@ -28,12 +28,8 @@ import (
 var addCmd = &cobra.Command{
 	Use:   "add [task to add]",
 	Short: "add a task to your todo list",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `add a task to your to do list.
+	example: add finish task cli app`,
 	Run: func(cmd *cobra.Command, args []string) {
 		taskName := strings.Join(args, " ")
 
@@ -41,9 +37,8 @@ to quickly create a Cobra application.`,
 		db := database.OpenDB()
 		defer db.Close()
 
-
 		err := task.Add(taskName, db)
-		if err != nil{
+		if err != nil {
 			fmt.Printf("Task could not be added: %v", err)
 		}
 		fmt.Printf("Task added: '%v'\n", taskName)

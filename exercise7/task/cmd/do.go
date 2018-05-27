@@ -28,12 +28,8 @@ import (
 var doCmd = &cobra.Command{
 	Use:   "do",
 	Short: "Complete a task in your todo list",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `Complete a task in your todo list.
+	example: do prepare for parents visit`,
 	Run: func(cmd *cobra.Command, args []string) {
 		taskName := strings.Join(args, " ")
 		db := database.OpenDB()
