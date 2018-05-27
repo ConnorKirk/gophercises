@@ -31,18 +31,33 @@ func Do(taskName string, db *bolt.DB) error {
 }
 
 // List prints all of the incomplete tasks
-func List(db *bolt.DB) {
+func List(db *bolt.DB) []string {
+	var ret []string
+
 	db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(database.TaskBucket))
-
 		c := b.Cursor()
 		for k, v := c.First(); k != nil; k, v = c.Next() {
 			if string(v) == incomplete {
-				fmt.Println(string(k))
+				ret = append(ret, string(k))
 			}
 		}
 
-
 		return nil
 	})
+
+	return ret
+}
+
+func PrintTasks(tasks []string) {
+	switch len(tasks) {
+	case 0:
+		fmt.Printf("No incomplete tasks found\nNice work!\n")
+	default:
+		fmt.Printf("Here are your current tasks:\n")
+		for i, t := range tasks {
+			fmt.Printf("#%v : %v\n", i+1, t)
+		}
+	}
+
 }

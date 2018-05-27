@@ -15,8 +15,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"gophercise/exercise7/task/database"
 	"gophercise/exercise7/task/task"
 
@@ -36,9 +34,8 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		db := database.OpenDB()
 		defer db.Close()
-
-		fmt.Println("Here are your current tasks:")
-		task.List(db)
+		tasks := task.List(db)
+		task.PrintTasks(tasks)
 	},
 }
 
